@@ -9,10 +9,12 @@ import (
 // Point in one dimensions
 type Point float64
 
+// NewPoint creates a one dimension new point
 func NewPoint(point float64) Point {
 	return Point(point)
 }
 
+// NewPoints returns a slice of one dimension points
 func NewPoints(points ...float64) []Point {
 	n := len(points)
 	p := make([]Point, 0, n)
@@ -23,6 +25,18 @@ func NewPoints(points ...float64) []Point {
 	return p
 }
 
+// NewDistances returns new one dimension distance points
+func NewDistances(points ...float64) []dimension.Distancer {
+	ps := NewPoints(points...)
+	d := make([]dimension.Distancer, 0, len(points))
+	for _, point := range ps {
+		d = append(d, point)
+	}
+	return d
+}
+
+// round rounds the floating point
+// number based on the prec given
 func round(x float64, prec int) float64 {
 	if x == 0 {
 		return 0
@@ -54,12 +68,16 @@ var (
 	_ dimension.Distancer = (*Point)(nil)
 )
 
-func (p *Point) Coordinates() []float64 {
-	return []float64{float64(*p)}
+// Coordinates creates a slice of coordinates of the
+// one dimensional point
+func (p Point) Coordinates() []float64 {
+	return []float64{float64(p)}
 }
 
-func (p *Point) Distance(x dimension.Point) float64 {
-	fp := float64(*p)
+// Distance computes the distance between the fixed point
+// and the given dimension.Point
+func (p Point) Distance(x dimension.Point) float64 {
+	fp := float64(p)
 	fx := x.Coordinates()[0]
 
 	if fp == 0.0 || fx == 0.0 {

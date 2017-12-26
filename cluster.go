@@ -19,7 +19,7 @@ var (
 	_ sort.Interface = (*Cluster)(nil)
 )
 
-// Create a new cluster from the given points
+// NewCluster create a cluster from the given points
 func NewCluster(points ...string) Cluster {
 	if len(points) == 1 {
 		return Cluster(points[0])
@@ -30,6 +30,7 @@ func NewCluster(points ...string) Cluster {
 	return cluster
 }
 
+// Slice returns a slice of points
 func (c Cluster) Slice() []string {
 	return strings.Split(string(c), ",")
 }
@@ -50,12 +51,17 @@ func (c Cluster) num(i int) int {
 	return int(num)
 }
 
+// Len returns the number of points in a cluster
 func (c Cluster) Len() int { return len(c.Slice()) }
+
+// Swap swaps cluster points
 func (c *Cluster) Swap(i, j int) {
 	slice := c.Slice()
 	slice[i], slice[j] = slice[j], slice[i]
 	*c = Cluster(strings.Join(slice, ","))
 }
+
+// Less compares two cluster points
 func (c Cluster) Less(i, j int) bool { return c.num(i) < c.num(j) }
 
 // Add appends a point in the cluster
@@ -101,6 +107,6 @@ func (c *Cluster) Delete(point string) {
 }
 
 // String returns the cluster representation as a string
-func (c *Cluster) String() string {
-	return fmt.Sprintf("{ %s }", *c)
+func (c Cluster) String() string {
+	return fmt.Sprintf("{ %s }", string(c))
 }

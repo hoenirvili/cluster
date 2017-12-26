@@ -15,6 +15,18 @@ type Distance struct {
 	points map[Cluster]float64
 }
 
+// String returns the string representation
+// of the cluster distance table
+func (d Distance) String() string {
+	str := fmt.Sprintf("%s =>", d.cluster)
+	for cluster, distance := range d.points {
+		str += fmt.Sprintf(" %s:%.2f", cluster, distance)
+	}
+
+	str += " "
+	return str
+}
+
 // NewDistances returns a table of cluster distances
 func NewDistances(points []dimension.Distancer) []Distance {
 	prefix := "x"
