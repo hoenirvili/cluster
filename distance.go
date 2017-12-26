@@ -6,12 +6,16 @@ import (
 	"github.com/hoenirvili/cluster/dimension"
 )
 
+// Distance holds all distances from one cluster to all other clusters
 type Distance struct {
+	// cluster the fixed point
 	cluster Cluster
-	points  map[Cluster]float64
+	// points mapping between the cluster and
+	// all other clusters based on the distance
+	points map[Cluster]float64
 }
 
-// NewDistances
+// NewDistances returns a table of cluster distances
 func NewDistances(points []dimension.Distancer) []Distance {
 	prefix := "x"
 	n := len(points)
@@ -20,7 +24,7 @@ func NewDistances(points []dimension.Distancer) []Distance {
 	for i := 0; i < n; i++ {
 		// create a new fixed cluster
 		distance := Distance{
-			cluster: NewCluster(fmt.Sprintf("%d%d", prefix, i+1)),
+			cluster: NewCluster(fmt.Sprintf("%s%d", prefix, i+1)),
 		}
 
 		// if we reached the end of the list
