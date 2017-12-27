@@ -31,7 +31,7 @@ func (cs clusterSuite) TestClusterString(c *gc.C) {
 
 func (cs clusterSuite) TestClusterAdd(c *gc.C) {
 	cls := cs.new(c)
-	point := "x5"
+	point := cluster.Cluster("x5")
 	cls.Add(point)
 	expected := cluster.Cluster("x1,x2,x3," + point)
 	c.Assert(cls, gc.DeepEquals, expected)
@@ -39,7 +39,7 @@ func (cs clusterSuite) TestClusterAdd(c *gc.C) {
 
 func (cs clusterSuite) TestClusterAddDupplicate(c *gc.C) {
 	cls := cs.new(c)
-	point := "x5"
+	point := cluster.Cluster("x5")
 	cls.Add(point)
 	expected := cluster.Cluster("x1,x2,x3," + point)
 	c.Assert(cls, gc.DeepEquals, expected)
@@ -49,7 +49,7 @@ func (cs clusterSuite) TestClusterAddDupplicate(c *gc.C) {
 
 func (cs clusterSuite) TestClusterDelete(c *gc.C) {
 	cls := cs.new(c)
-	point := "x3"
+	point := cluster.Cluster("x3")
 	cls.Delete(point)
 	expected := cluster.Cluster("x1,x2")
 	c.Assert(cls, gc.DeepEquals, expected)

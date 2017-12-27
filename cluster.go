@@ -66,23 +66,24 @@ func (c Cluster) Less(i, j int) bool { return c.num(i) < c.num(j) }
 
 // Add appends a point in the cluster
 // If the point is already in the cluster it will be no-op
-func (c *Cluster) Add(point string) {
+func (c *Cluster) Add(point Cluster) {
 	slice := c.Slice()
 	n := len(slice)
+	ps := string(point)
 
 	for i := 0; i < n; i++ {
-		if slice[i] == point {
+		if slice[i] == ps {
 			return
 		}
 	}
 
-	slice = append(slice, point)
+	slice = append(slice, ps)
 	*c = Cluster(strings.Join(slice, ","))
 	sort.Sort(c)
 }
 
 // Delete a given point from the cluster
-func (c *Cluster) Delete(point string) {
+func (c *Cluster) Delete(point Cluster) {
 	slice := c.Slice()
 	n := len(slice)
 	if n == 0 {
@@ -91,7 +92,7 @@ func (c *Cluster) Delete(point string) {
 
 	i := -1
 	for j := 0; j < n; j++ {
-		if slice[j] == point {
+		if slice[j] == string(point) {
 			i = j
 			break
 		}
