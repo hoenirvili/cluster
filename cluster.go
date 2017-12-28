@@ -35,6 +35,20 @@ func (c Cluster) Slice() []string {
 	return strings.Split(string(c), ",")
 }
 
+// In returns true if the cluster is found in the
+// set of clusters
+func (c Cluster) In(cluster Cluster) bool {
+	slice := c.Slice()
+
+	for _, element := range slice {
+		if Cluster(element) == cluster {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (c Cluster) num(i int) int {
 	slice := c.Slice()
 	suffix := slice[i][1:]

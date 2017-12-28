@@ -193,13 +193,44 @@ func (cl clusterSuite) TestDistanceRefit(c *gc.C) {
 	distances[0].Merge(second)
 	first.Add(second)
 	cluster.Refit(&distances, first, second, cluster.SingleLinkage)
-	for _, d := range distances {
-		fmt.Println(d)
-	}
-
 	for i, d := range distances {
 		one := d
 		second := expected[i]
 		c.Assert(one, gc.DeepEquals, second)
 	}
+
+}
+
+func (cl clusterSuite) TestDistanceRefitIter(c *gc.C) {
+	distances := cl.distances(c)
+	n := len(distances)
+	min := -1.0
+	var (
+		min_cluster cluster.Cluster
+		s           cluster.Cluster
+		j           int
+	)
+
+	for _, d := range distances {
+		fmt.Println(d)
+	}
+
+	for i := 0; i < n; i++ {
+		first, second, distance := distances[i].Best()
+		if min == -1.0 || min > distance {
+			min = distance
+			first.Add(second)
+			min_cluster = first
+			s = second
+			j = i
+		}
+	}
+
+	distances[j].Merge(s)
+	fmt.Println(min_cluster)
+	cluster.Refit(&distances, min_cluster, s, cluster.SingleLinkage)
+	for _, d := range distances {
+		fmt.Println(d)
+	}
+
 }

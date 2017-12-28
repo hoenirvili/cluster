@@ -43,6 +43,7 @@ func singleLinkage(first, second map[Cluster]float64) {
 		if !ok {
 			continue
 		}
+
 		if fv > sv {
 			first[key] = sv
 		} else {
@@ -67,9 +68,11 @@ func Refit(points *[]Distance, first, second Cluster, t trefit) {
 
 	n := len(*points)
 	j := 0 // we save the second cluster to remove it from the table
+	fixed := 0
 	for i := 0; i < n; i++ {
 		// we found that first cluster
 		if (*points)[i].Cluster == first {
+			fixed = i
 			for j = 0; j < n; j++ {
 				if i == j {
 					continue
@@ -84,7 +87,41 @@ func Refit(points *[]Distance, first, second Cluster, t trefit) {
 		}
 	}
 
+	// remove the j element from the slice but
+	// perserve the order
 	*points = append((*points)[:j], (*points)[j+1:]...)
+
+	recomputeDistances(*points, fixed)
+}
+
+// recomputeDistances based on the fixed point
+func recomputeDistances(points []Distance, fixed int) {
+	n := len(points)
+
+	fixCluster := points[fixed].Cluster
+	for i := 0; i < n; i++ {
+		if i == fixed {
+			continue
+		}
+
+		best := -1.0
+		var previous Cluster
+		// TODO(hoenir): But what about the average and complete?
+		for cluster, distance := range points[i].Points {
+			if fixCluster.In(cluster) {
+				if best == -1.0 {
+					best = distance
+					previous = cluster
+					continue
+				}
+				if best > distance {
+					best = distance
+					delete(points[i].Points, previous)
+					previous = cluster
+				}
+			}
+		}
+	}
 }
 
 // NewDistances returns a table of cluster distances
@@ -125,6 +162,8 @@ func NewDistances(points []dimension.Distancer) []Distance {
 
 // Best returns the best fitted cluster pairs
 func (d Distance) Best() (Cluster, Cluster, float64) {
+	// TODO(hoenir): make this pick based on trefit type
+	// TODO(hoenir): do we really need the best distance?
 	bestDistance := -1.0
 	bestCluster := Cluster("")
 	for c, distance := range d.Points {
@@ -146,4 +185,8 @@ func (d Distance) Best() (Cluster, Cluster, float64) {
 func (d *Distance) Merge(c Cluster) {
 	d.Cluster.Add(c)
 	delete(d.Points, c)
+}
+
+func Fit(points []Distance, clusters int) []Cluster {
+	// for i
 }

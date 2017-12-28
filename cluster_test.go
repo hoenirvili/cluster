@@ -37,7 +37,7 @@ func (cs clusterSuite) TestClusterAdd(c *gc.C) {
 	c.Assert(cls, gc.DeepEquals, expected)
 }
 
-func (cs clusterSuite) TestClusterAddDupplicate(c *gc.C) {
+func (cs clusterSuite) TestClusterAddDuplicate(c *gc.C) {
 	cls := cs.new(c)
 	point := cluster.Cluster("x5")
 	cls.Add(point)
@@ -73,4 +73,10 @@ func (cs clusterSuite) TestClusterLess(c *gc.C) {
 	cls := cs.new(c)
 	got := cls.Less(0, 2)
 	c.Assert(got, gc.Equals, true)
+}
+
+func (cs clusterSuite) TestClusterIn(c *gc.C) {
+	cls := cs.new(c)
+	found := cls.In("x1")
+	c.Assert(found, gc.Equals, true)
 }
