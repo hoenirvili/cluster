@@ -1,7 +1,12 @@
 package cluster_test
 
 import (
+	"fmt"
+
 	"github.com/hoenirvili/cluster"
+	"github.com/hoenirvili/cluster/dimension/one"
+	"github.com/hoenirvili/cluster/distance"
+	"github.com/hoenirvili/cluster/set"
 	gc "gopkg.in/check.v1"
 )
 
@@ -9,74 +14,302 @@ type clusterSuite struct{}
 
 var _ = gc.Suite(&clusterSuite{})
 
-func (cs clusterSuite) new(c *gc.C) cluster.Cluster {
-	cls := cluster.NewCluster("x2", "x3", "x1")
-	c.Assert(cls, gc.NotNil)
-	c.Assert(cls, gc.DeepEquals, cluster.Cluster("x1,x2,x3"))
-	return cls
+func (cs clusterSuite) distances(c *gc.C) []distance.Distance {
+	points := one.NewDistances(-0.3, 0.1, 0.2, 0.4, 1.6, 1.7, 1.9, 2.0)
+	c.Assert(points, gc.NotNil)
+	distances := distance.NewDistances(points)
+	c.Assert(distances, gc.NotNil)
+	return distances
 }
 
-func (cs clusterSuite) TestClusterSlice(c *gc.C) {
-	cluster := cs.new(c)
-	slice := cluster.Slice()
-	c.Assert(slice, gc.DeepEquals, []string{"x1", "x2", "x3"})
-}
+// func (cs clusterSuite) TestNewDistances(c *gc.C) {
+// 	expected := []cluster.Distance{
+// 		{
+// 			Cluster: "x1",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x6": 2.00,
+// 				"x7": 2.20,
+// 				"x8": 2.30,
+// 				"x2": 0.40,
+// 				"x3": 0.50,
+// 				"x4": 0.70,
+// 				"x5": 1.90,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x2",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x3": 0.10,
+// 				"x4": 0.30,
+// 				"x5": 1.50,
+// 				"x6": 1.60,
+// 				"x7": 1.80,
+// 				"x8": 1.90,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x3",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x5": 1.40,
+// 				"x6": 1.50,
+// 				"x7": 1.70,
+// 				"x8": 1.80,
+// 				"x4": 0.20,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x4",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x5": 1.20,
+// 				"x6": 1.30,
+// 				"x7": 1.50,
+// 				"x8": 1.60,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x5",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x8": 0.40,
+// 				"x6": 0.10,
+// 				"x7": 0.30,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x6",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x7": 0.20,
+// 				"x8": 0.30,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x7",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x8": 0.10,
+// 			},
+// 		},
+// 	}
+// 	points := one.NewDistances(-0.3, 0.1, 0.2, 0.4, 1.6, 1.7, 1.9, 2.0)
+// 	c.Assert(points, gc.NotNil)
+// 	distances := cluster.NewDistances(points)
+// 	c.Assert(distances, gc.NotNil)
+// 	for index, distance := range distances {
+// 		one := distance
+// 		two := expected[index]
+// 		c.Assert(one.Cluster, gc.DeepEquals, two.Cluster)
+// 		for index, p := range one.Points {
+// 			c.Assert(p, gc.DeepEquals, two.Points[index])
+// 		}
+// 	}
+// }
 
-func (cs clusterSuite) TestClusterString(c *gc.C) {
-	expected := "{ x1,x2,x3 }"
-	cluster := cs.new(c)
-	got := cluster.String()
-	c.Assert(got, gc.DeepEquals, expected)
-}
+// func (cl clusterSuite) TestDistanceBest(c *gc.C) {
+// 	distances := cl.distances(c)
+// 	pair := [][]cluster.Cluster{
+// 		{"x1", "x2"},
+// 		{"x2", "x3"},
+// 		{"x3", "x4"},
+// 		{"x4", "x5"},
+// 		{"x5", "x6"},
+// 		{"x6", "x7"},
+// 		{"x7", "x8"},
+// 	}
 
-func (cs clusterSuite) TestClusterAdd(c *gc.C) {
-	cls := cs.new(c)
-	point := cluster.Cluster("x5")
-	cls.Add(point)
-	expected := cluster.Cluster("x1,x2,x3," + point)
-	c.Assert(cls, gc.DeepEquals, expected)
-}
+// 	bestDistances := []float64{0.40, 0.10, 0.20, 1.20, 0.10, 0.20, 0.10}
 
-func (cs clusterSuite) TestClusterAddDuplicate(c *gc.C) {
-	cls := cs.new(c)
-	point := cluster.Cluster("x5")
-	cls.Add(point)
-	expected := cluster.Cluster("x1,x2,x3," + point)
-	c.Assert(cls, gc.DeepEquals, expected)
-	cls.Add(point)
-	c.Assert(cls, gc.DeepEquals, expected)
-}
+// 	for i, distance := range distances {
+// 		first, second, d := distance.Best()
+// 		clusters := pair[i]
+// 		c.Assert(first, gc.DeepEquals, distance.Cluster)
+// 		c.Assert(clusters[0], gc.Equals, first)
+// 		c.Assert(clusters[1], gc.Equals, second)
+// 		c.Assert(d, gc.Equals, bestDistances[i])
+// 	}
+// }
 
-func (cs clusterSuite) TestClusterDelete(c *gc.C) {
-	cls := cs.new(c)
-	point := cluster.Cluster("x3")
-	cls.Delete(point)
-	expected := cluster.Cluster("x1,x2")
-	c.Assert(cls, gc.DeepEquals, expected)
-}
+// func (cl clusterSuite) TestDistanceMerge(c *gc.C) {
+// 	distance := cl.distances(c)[0]
 
-func (cs clusterSuite) TestClusterLen(c *gc.C) {
-	cls := cs.new(c)
-	got := cls.Len()
-	expected := 3
-	c.Assert(got, gc.Equals, expected)
-}
+// 	first, second, _ := distance.Best()
+// 	c.Assert(first, gc.Equals, distance.Cluster)
+// 	distance.Merge(second)
+// 	first.Add(second)
+// 	c.Assert(distance.Cluster, gc.DeepEquals, first)
+// 	_, ok := distance.Points[second]
+// 	c.Assert(ok, gc.Equals, false)
+// }
 
-func (cs clusterSuite) TestClusterSwap(c *gc.C) {
-	cls := cs.new(c)
-	cls.Swap(0, 2)
-	slice := cls.Slice()
-	c.Assert(slice, gc.DeepEquals, []string{"x3", "x2", "x1"})
-}
+// func (cl clusterSuite) TestDistanceRefit(c *gc.C) {
+// 	expected := []cluster.Distance{
+// 		{
+// 			Cluster: "x1,x2",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x6": 1.60,
+// 				"x7": 1.80,
+// 				"x8": 1.90,
+// 				"x3": 0.10,
+// 				"x4": 0.30,
+// 				"x5": 1.50,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x3",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x5": 1.40,
+// 				"x6": 1.50,
+// 				"x7": 1.70,
+// 				"x8": 1.80,
+// 				"x4": 0.20,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x4",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x5": 1.20,
+// 				"x6": 1.30,
+// 				"x7": 1.50,
+// 				"x8": 1.60,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x5",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x8": 0.40,
+// 				"x6": 0.10,
+// 				"x7": 0.30,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x6",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x7": 0.20,
+// 				"x8": 0.30,
+// 			},
+// 		},
+// 		{
+// 			Cluster: "x7",
+// 			Points: map[cluster.Cluster]float64{
+// 				"x8": 0.10,
+// 			},
+// 		},
+// 	}
 
-func (cs clusterSuite) TestClusterLess(c *gc.C) {
-	cls := cs.new(c)
-	got := cls.Less(0, 2)
-	c.Assert(got, gc.Equals, true)
-}
+// 	distances := cl.distances(c)
 
-func (cs clusterSuite) TestClusterIn(c *gc.C) {
-	cls := cs.new(c)
-	found := cls.In("x1")
-	c.Assert(found, gc.Equals, true)
+// 	first, second, _ := distances[0].Best()
+// 	distances[0].Merge(second)
+// 	first.Add(second)
+// 	cluster.Refit(&distances, first, second, cluster.SingleLinkage)
+// 	for i, d := range distances {
+// 		one := d
+// 		second := expected[i]
+// 		c.Assert(one, gc.DeepEquals, second)
+// 	}
+
+// }
+
+// func (cl clusterSuite) TestDistanceRefitIter(c *gc.C) {
+// 	distances := cl.distances(c)
+// 	n := len(distances)
+// 	min := -1.0
+// 	var (
+// 		min_cluster cluster.Cluster
+// 		s           cluster.Cluster
+// 		j           int
+// 	)
+// 	for i := 0; i < n; i++ {
+// 		first, second, distance := distances[i].Best()
+// 		if min == -1.0 || min > distance {
+// 			min = distance
+// 			first.Add(second)
+// 			min_cluster = first
+// 			s = second
+// 			j = i
+// 		}
+// 	}
+
+// 	distances[j].Merge(s)
+// 	fmt.Println(min_cluster)
+// 	cluster.Refit(&distances, min_cluster, s, cluster.SingleLinkage)
+
+// }
+
+// func (cl clusterSuite) TestDistanceFit(c *gc.C) {
+// 	distances := cl.distances(c)
+// 	for _, d := range distances {
+// 		fmt.Println(d)
+
+// 	}
+
+// 	// -0.3, 0.1, 0.2, 0.4, 1.6, 1.7, 1.9, 2.0
+// 	clusters := cluster.Fit(distances, cluster.SingleLinkage, 3)
+// 	fmt.Println(clusters)
+// }
+
+// func (cl clusterSuite) TestDistanceFitComplete(c *gc.C) {
+// 	distances := cl.distances(c)
+// 	for _, d := range distances {
+// 		fmt.Println(d)
+
+// 	}
+
+// 	//-0.3, 0.1, 0.2, 0.4, 1.6, 1.7, 1.9, 2.0
+// 	clusters := cluster.Fit(distances, cluster.CompleteLinkage, 2)
+// 	fmt.Println(clusters)
+// }
+
+func (cl clusterSuite) TestCustomDistanceFit(c *gc.C) {
+	distances := []distance.Distance{
+		{
+			Set: set.Set("x1"),
+			Points: map[set.Set]float64{
+				"x2": 0.12,
+				"x3": 0.51,
+				"x4": 0.84,
+				"x5": 0.28,
+				"x6": 0.34,
+			},
+		},
+		{
+			Set: set.Set("x2"),
+			Points: map[set.Set]float64{
+				"x3": 0.25,
+				"x4": 0.16,
+				"x5": 0.77,
+				"x6": 0.61,
+			},
+		},
+		{
+			Set: set.Set("x3"),
+			Points: map[set.Set]float64{
+				"x4": 0.14,
+				"x5": 0.70,
+				"x6": 0.93,
+			},
+		},
+		{
+			Set: set.Set("x4"),
+			Points: map[set.Set]float64{
+				"x5": 0.75,
+				"x6": 0.20,
+			},
+		},
+		{
+			Set: set.Set("x5"),
+			Points: map[set.Set]float64{
+				"x6": 0.67,
+			},
+		},
+		{
+			Set:    set.Set("x6"),
+			Points: nil,
+		},
+	}
+
+	for _, d := range distances {
+		fmt.Println(d)
+	}
+
+	//TODO(hoenir): this is not good yet.
+	clusters := cluster.Fit(distances, cluster.CompleteLinkage, 2)
+	fmt.Println(clusters)
 }
