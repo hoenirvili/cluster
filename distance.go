@@ -40,6 +40,7 @@ const (
 
 // Swapper defines the criteria of which we swap and
 // replace the best point based on the cluster implementation
+// and recompute their distances
 type Swapper interface {
 	Swap(first, second map[set.Set]float64)
 	Recompute(based set.Set, on map[set.Set]float64) (float64, []set.Set)
@@ -69,9 +70,19 @@ func refit(points *[]distance.Distance, first, second set.Set, s Swapper) {
 			break
 		}
 	}
+
 	// we didn't find the second cluster
 	if j != n {
 		*points = append((*points)[:j], (*points)[j+1:]...)
+	}
+
+	// the last should always be nil
+	last := len(*points) - 1
+	if (*points)[last].Points != nil {
+		for key := range (*points)[last].Points {
+			delete((*points)[last].Points, key)
+		}
+		(*points)[last].Points = nil
 	}
 
 	recomputeDistances(*points, base, s)
@@ -120,7 +131,7 @@ func Fit(points []distance.Distance, s strategy, k int) []set.Set {
 	case CompleteLinkage:
 		swapper = &completelinkage.CompleteLinkge{}
 	case AverageLinkage:
-		swapper = &averagelinkage.AverageLinkage{}
+		swapper = &averagelinkage.AverageLinkage{Table: points}
 	}
 
 	pair := struct{ first, second set.Set }{}

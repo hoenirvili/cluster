@@ -2,7 +2,6 @@ package dimension
 
 // Point defines a given one, two or n dimension point
 type Point interface {
-
 	// Coordinates returns the coordinates of the n dimension point
 	Coordinates() []float64
 }

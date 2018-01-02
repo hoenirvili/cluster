@@ -309,7 +309,6 @@ func (cl clusterSuite) TestCustomDistanceFit(c *gc.C) {
 		fmt.Println(d)
 	}
 
-	//TODO(hoenir): this is not good yet.
-	clusters := cluster.Fit(distances, cluster.CompleteLinkage, 2)
+	clusters := cluster.Fit(distances, cluster.AverageLinkage, 4)
 	fmt.Println(clusters)
 }

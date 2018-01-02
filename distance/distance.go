@@ -74,7 +74,6 @@ func (d *Distance) Merge(c set.Set) {
 	delete(d.Points, c)
 }
 
-// Best returns the best fitted cluster pairs
 func (d Distance) Best() (set.Set, set.Set, float64) {
 	bestDistance := -1.0
 	bestCluster := set.NewSet()
