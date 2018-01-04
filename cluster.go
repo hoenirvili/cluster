@@ -38,32 +38,82 @@ const (
 	AverageLinkage
 )
 
-// Swapper defines the criteria of which we swap and
+// swapper defines the criteria of which we swap and
 // replace the best point based on the cluster implementation
 // and recompute their distances
-type Swapper interface {
-	Swap(first, second map[set.Set]float64)
-	Recompute(based set.Set, on map[set.Set]float64) (float64, []set.Set)
+type swapper interface {
+	Swap(first, second distance.Distance)
+	Recompute(based set.Set, on map[set.Set]float64) (best float64, deleted []set.Set)
 }
 
-func refit(points *[]distance.Distance, first, second set.Set, s Swapper) {
-	if first == second {
-		return
+// Fit will cluster the points into k clusters based on the strategy provided
+func Fit(points []distance.Distance, s strategy, k int) []set.Set {
+	if k <= 0 || k > len(points) {
+		return nil
 	}
 
-	n, j := len(*points), 0
+	var swapper swapper
+	switch s {
+	case SingleLinkage:
+		swapper = singlelinkage.NewSingleLinkage()
+	case CompleteLinkage:
+		swapper = completelinkage.NewCompleteLinkage()
+	case AverageLinkage:
+		swapper = averagelinkage.NewAverageLinkage(points)
+	}
+
+	pair := struct{ first, second set.Set }{}
+	for n := len(points); k != n; n = len(points) {
+		bestDistance := -1.0
+		j := 0
+		for i := 0; i < n; i++ {
+			f, s, distance := points[i].Best()
+			if f == s {
+				continue
+			}
+			if bestDistance == -1 || bestDistance > distance {
+				bestDistance = distance
+				pair.first, pair.second = f, s
+				j = i
+			}
+		}
+
+		points[j].Merge(pair.second)
+		points = refit(points, pair.first, pair.second, swapper)
+
+		fmt.Println("BEGIN")
+		for _, d := range points {
+			fmt.Println(d)
+		}
+		fmt.Println("END")
+	}
+
+	cls := make([]set.Set, 0, k)
+	for _, c := range points {
+		cls = append(cls, c.Set)
+	}
+
+	return cls
+}
+
+func refit(points []distance.Distance, first, second set.Set, s swapper) []distance.Distance {
+	if first == second {
+		return points
+	}
+
+	n, j := len(points), 0
 	var base set.Set
 	for i := 0; i < n; i++ {
 		// we found the first cluster
-		if (*points)[i].Set == first {
-			base = (*points)[i].Set
+		if points[i].Set == first {
+			base = points[i].Set
 			for j = 0; j < n; j++ {
 				if i == j {
 					continue
 				}
 				// we found the second cluster
-				if (*points)[j].Set == second {
-					s.Swap((*points)[i].Points, (*points)[j].Points)
+				if points[j].Set == second {
+					s.Swap(points[i], points[j])
 					break
 				}
 			}
@@ -73,24 +123,25 @@ func refit(points *[]distance.Distance, first, second set.Set, s Swapper) {
 
 	// we didn't find the second cluster
 	if j != n {
-		*points = append((*points)[:j], (*points)[j+1:]...)
+		points = append(points[:j], points[j+1:]...)
 	}
 
 	// the last should always be nil
-	last := len(*points) - 1
-	if (*points)[last].Points != nil {
-		for key := range (*points)[last].Points {
-			delete((*points)[last].Points, key)
+	last := len(points) - 1
+	if (points)[last].Points != nil {
+		for key := range points[last].Points {
+			delete(points[last].Points, key)
 		}
-		(*points)[last].Points = nil
+		points[last].Points = nil
 	}
 
-	recomputeDistances(*points, base, s)
+	recomputeDistances(points, base, s)
+	return points
 }
 
 // recomputeDistances recomputes the table of distances using
 // the base cluster as relative distances.
-func recomputeDistances(points []distance.Distance, base set.Set, s Swapper) {
+func recomputeDistances(points []distance.Distance, base set.Set, s swapper) {
 	n := len(points)
 	for i := 0; i < n; i++ {
 		if points[i].Set == base {
@@ -116,55 +167,4 @@ func recomputeDistances(points []distance.Distance, base set.Set, s Swapper) {
 			}
 		}
 	}
-}
-
-// Fit will cluster the points into k clusters based on the strategy provided
-func Fit(points []distance.Distance, s strategy, k int) []set.Set {
-	if k <= 0 || k > len(points) {
-		return nil
-	}
-
-	var swapper Swapper
-	switch s {
-	case SingleLinkage:
-		swapper = &singlelinkage.SingleLinkage{}
-	case CompleteLinkage:
-		swapper = &completelinkage.CompleteLinkge{}
-	case AverageLinkage:
-		swapper = &averagelinkage.AverageLinkage{Table: points}
-	}
-
-	pair := struct{ first, second set.Set }{}
-	for n := len(points); k != n; n = len(points) {
-		bestDistance := -1.0
-		j := 0
-		for i := 0; i < n; i++ {
-			f, s, distance := points[i].Best()
-			if f == s {
-				continue
-			}
-			if bestDistance == -1 || bestDistance > distance {
-				bestDistance = distance
-				pair.first, pair.second = f, s
-				j = i
-			}
-		}
-
-		points[j].Merge(pair.second)
-		refit(&points, pair.first, pair.second, swapper)
-
-		fmt.Println("BEGIN")
-		for _, d := range points {
-			fmt.Println(d)
-		}
-		fmt.Println("END")
-		fmt.Println()
-	}
-
-	cls := make([]set.Set, 0, k)
-	for _, c := range points {
-		cls = append(cls, c.Set)
-	}
-
-	return cls
 }

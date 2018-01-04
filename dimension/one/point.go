@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/hoenirvili/cluster/dimension"
+	"github.com/hoenirvili/cluster/util"
 )
 
 // Point in one dimensions
@@ -35,34 +36,6 @@ func NewDistances(points ...float64) []dimension.Distancer {
 	return d
 }
 
-// round rounds the floating point
-// number based on the prec given
-func round(x float64, prec int) float64 {
-	if x == 0 {
-		return 0
-	}
-	if prec >= 0 && x == math.Trunc(x) {
-		return x
-	}
-
-	pow := math.Pow10(prec)
-	intermed := x * pow
-	if math.IsInf(intermed, 0) {
-		return x
-	}
-	if x < 0 {
-		x = math.Ceil(intermed - 0.5)
-	} else {
-		x = math.Floor(intermed + 0.5)
-	}
-
-	if x == 0 {
-		return 0
-	}
-
-	return x / pow
-}
-
 var (
 	_ dimension.Point     = (*Point)(nil)
 	_ dimension.Distancer = (*Point)(nil)
@@ -88,9 +61,9 @@ func (p Point) Distance(x dimension.Point) float64 {
 		fx = math.Abs(fx)
 		fp = math.Abs(fp)
 		if fx > fp {
-			return round(fx-fp, 4)
+			return util.Round(fx-fp, 4)
 		}
-		return round(fp-fx, 4)
+		return util.Round(fp-fx, 4)
 	}
 
 	if fx < 0.0 && fp > 0.0 || fx > 0.0 && fp < 0.0 {
@@ -98,5 +71,5 @@ func (p Point) Distance(x dimension.Point) float64 {
 		fp = math.Abs(fp)
 	}
 
-	return round(fp+fx, 4)
+	return util.Round(fp+fx, 4)
 }

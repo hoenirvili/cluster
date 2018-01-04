@@ -1,12 +1,9 @@
 package cluster_test
 
 import (
-	"fmt"
-
-	"github.com/hoenirvili/cluster"
 	"github.com/hoenirvili/cluster/dimension/one"
+	"github.com/hoenirvili/cluster/dimension/two"
 	"github.com/hoenirvili/cluster/distance"
-	"github.com/hoenirvili/cluster/set"
 	gc "gopkg.in/check.v1"
 )
 
@@ -14,8 +11,19 @@ type clusterSuite struct{}
 
 var _ = gc.Suite(&clusterSuite{})
 
-func (cs clusterSuite) distances(c *gc.C) []distance.Distance {
+func (cs clusterSuite) oneDistances(c *gc.C) []distance.Distance {
 	points := one.NewDistances(-0.3, 0.1, 0.2, 0.4, 1.6, 1.7, 1.9, 2.0)
+	c.Assert(points, gc.NotNil)
+	distances := distance.NewDistances(points)
+	c.Assert(distances, gc.NotNil)
+	return distances
+}
+
+func (cs clusterSuite) twoDistances(c *gc.C) []distance.Distance {
+	points := two.NewDistances(
+		[]float64{-4, -3, -2, -1, 1, 1, 2, 3, 3, 4},
+		[]float64{-2, -2, -2, -2, -1, 1, 3, 2, 4, 3},
+	)
 	c.Assert(points, gc.NotNil)
 	distances := distance.NewDistances(points)
 	c.Assert(distances, gc.NotNil)
@@ -257,58 +265,64 @@ func (cs clusterSuite) distances(c *gc.C) []distance.Distance {
 // 	fmt.Println(clusters)
 // }
 
-func (cl clusterSuite) TestCustomDistanceFit(c *gc.C) {
-	distances := []distance.Distance{
-		{
-			Set: set.Set("x1"),
-			Points: map[set.Set]float64{
-				"x2": 0.12,
-				"x3": 0.51,
-				"x4": 0.84,
-				"x5": 0.28,
-				"x6": 0.34,
-			},
-		},
-		{
-			Set: set.Set("x2"),
-			Points: map[set.Set]float64{
-				"x3": 0.25,
-				"x4": 0.16,
-				"x5": 0.77,
-				"x6": 0.61,
-			},
-		},
-		{
-			Set: set.Set("x3"),
-			Points: map[set.Set]float64{
-				"x4": 0.14,
-				"x5": 0.70,
-				"x6": 0.93,
-			},
-		},
-		{
-			Set: set.Set("x4"),
-			Points: map[set.Set]float64{
-				"x5": 0.75,
-				"x6": 0.20,
-			},
-		},
-		{
-			Set: set.Set("x5"),
-			Points: map[set.Set]float64{
-				"x6": 0.67,
-			},
-		},
-		{
-			Set:    set.Set("x6"),
-			Points: nil,
-		},
-	}
+// func (cl clusterSuite) TestCustomDistanceFit(c *gc.C) {
+// 	distances := []distance.Distance{
+// 		{
+// 			Set: set.Set("x1"),
+// 			Points: map[set.Set]float64{
+// 				"x2": 0.12,
+// 				"x3": 0.51,
+// 				"x4": 0.84,
+// 				"x5": 0.28,
+// 				"x6": 0.34,
+// 			},
+// 		},
+// 		{
+// 			Set: set.Set("x2"),
+// 			Points: map[set.Set]float64{
+// 				"x3": 0.25,
+// 				"x4": 0.16,
+// 				"x5": 0.77,
+// 				"x6": 0.61,
+// 			},
+// 		},
+// 		{
+// 			Set: set.Set("x3"),
+// 			Points: map[set.Set]float64{
+// 				"x4": 0.14,
+// 				"x5": 0.70,
+// 				"x6": 0.93,
+// 			},
+// 		},
+// 		{
+// 			Set: set.Set("x4"),
+// 			Points: map[set.Set]float64{
+// 				"x5": 0.75,
+// 				"x6": 0.20,
+// 			},
+// 		},
+// 		{
+// 			Set: set.Set("x5"),
+// 			Points: map[set.Set]float64{
+// 				"x6": 0.67,
+// 			},
+// 		},
+// 		{
+// 			Set:    set.Set("x6"),
+// 			Points: nil,
+// 		},
+// 	}
 
-	for _, d := range distances {
-		fmt.Println(d)
-	}
+// 	for _, d := range distances {
+// 		fmt.Println(d)
+// 	}
 
-	clusters := cluster.Fit(distances, cluster.AverageLinkage, 4)
-	fmt.Println(clusters)
-}
+// 	clusters := cluster.Fit(distances, cluster.AverageLinkage, 2)
+// 	fmt.Println(clusters)
+// }
+
+// func (cl clusterSuite) TestCustomDistanceFit(c *gc.C) {
+// 	distances := cl.twoDistances(c)
+// 	clusters := cluster.Fit(distances, cluster.AverageLinkage, 3)
+// 	fmt.Println(clusters)
+// }

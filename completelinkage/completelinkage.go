@@ -3,23 +3,23 @@ package completelinkage
 import (
 	"math"
 
+	"github.com/hoenirvili/cluster/distance"
 	"github.com/hoenirvili/cluster/set"
 )
 
 type CompleteLinkge struct{}
 
-func (c CompleteLinkge) Swap(first, second map[set.Set]float64) {
-	if first == nil || second == nil ||
-		len(first) == 0 || len(second) == 0 {
-		return
-	}
+func NewCompleteLinkage() *CompleteLinkge {
+	return &CompleteLinkge{}
+}
 
-	for fc, f := range first {
-		s, ok := second[fc]
+func (c CompleteLinkge) Swap(first, second distance.Distance) {
+	for fc, f := range first.Points {
+		s, ok := second.Points[fc]
 		if !ok {
 			continue
 		}
-		first[fc] = math.Max(f, s)
+		first.Points[fc] = math.Max(f, s)
 	}
 }
 

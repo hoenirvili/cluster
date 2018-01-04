@@ -3,23 +3,23 @@ package singlelinkage
 import (
 	"math"
 
+	"github.com/hoenirvili/cluster/distance"
 	"github.com/hoenirvili/cluster/set"
 )
 
 type SingleLinkage struct{}
 
-func (s SingleLinkage) Swap(first, second map[set.Set]float64) {
-	if first == nil || second == nil ||
-		len(first) == 0 || len(second) == 0 {
-		return
-	}
+func NewSingleLinkage() *SingleLinkage {
+	return &SingleLinkage{}
+}
 
-	for fc, f := range first {
-		s, ok := second[fc]
+func (s SingleLinkage) Swap(first, second distance.Distance) {
+	for fc, f := range first.Points {
+		s, ok := second.Points[fc]
 		if !ok {
 			continue
 		}
-		first[fc] = math.Min(f, s)
+		first.Points[fc] = math.Min(f, s)
 	}
 }
 

@@ -65,6 +65,8 @@ func (d Distance) String() string {
 	return str
 }
 
+// Merge merges two sets together and removes
+// the distance in the map that has the set given
 func (d *Distance) Merge(c set.Set) {
 	if d.Set == c {
 		return

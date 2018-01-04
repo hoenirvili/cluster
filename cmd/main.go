@@ -4,16 +4,19 @@ import (
 	"fmt"
 
 	"github.com/hoenirvili/cluster"
-	"github.com/hoenirvili/cluster/dimension/one"
+	"github.com/hoenirvili/cluster/dimension/two"
+	"github.com/hoenirvili/cluster/distance"
 )
 
 func main() {
-	points := one.NewDistances(-0.3, 0.1, 0.2, 0.4, 1.6, 1.7, 1.9, 2.0)
-	distances := cluster.NewDistances(points)
+	points := two.NewDistances(
+		[]float64{-4, -3, -2, -1, 1, 1, 2, 3, 3, 4},
+		[]float64{-2, -2, -2, -2, -1, 1, 3, 2, 4, 3},
+	)
+	distances := distance.NewDistances(points)
 	for _, d := range distances {
 		fmt.Println(d)
-
 	}
-	clusters := cluster.Fit(distances, cluster.SingleLinkage, 4)
+	clusters := cluster.Fit(distances, cluster.AverageLinkage, 3)
 	fmt.Println(clusters)
 }
