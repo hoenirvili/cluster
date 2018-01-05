@@ -53,6 +53,8 @@ type Distance struct {
 	Points map[set.Set]float64
 }
 
+var _ fmt.Stringer = (*Distance)(nil)
+
 // String returns the string representation
 // of the cluster distance table
 func (d Distance) String() string {
@@ -76,6 +78,10 @@ func (d *Distance) Merge(c set.Set) {
 	delete(d.Points, c)
 }
 
+// Best picks a pair of clusters and minimum distance
+// of the hole row of distances
+// If row does not contain distance points it will return
+// an empty pair and 0.0
 func (d Distance) Best() (set.Set, set.Set, float64) {
 	bestDistance := -1.0
 	bestCluster := set.NewSet()
@@ -95,6 +101,13 @@ func (d Distance) Best() (set.Set, set.Set, float64) {
 		if newDistance != bestDistance {
 			bestCluster = cluster
 			bestDistance = newDistance
+			continue
+		}
+
+		if newDistance == bestDistance {
+			if cluster.Priority(bestCluster) {
+				bestCluster = cluster
+			}
 		}
 	}
 

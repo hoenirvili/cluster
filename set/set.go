@@ -86,6 +86,26 @@ func (s Set) num(i int) int {
 	return int(num)
 }
 
+// Simple tests if the set has one element
+// this will return true
+func (s Set) Simple() bool {
+	return 1 == len(s.Slice())
+}
+
+// Priority returns true if the given
+// cluster is greater than the fixed one
+func (s Set) Priority(set Set) bool {
+	if !s.Simple() || !set.Simple() {
+		return false
+	}
+
+	if s.num(0) < set.num(0) {
+		return true
+	}
+
+	return false
+}
+
 // Len returns the number of points in a cluster
 func (s Set) Len() int { return len(s.Slice()) }
 

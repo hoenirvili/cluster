@@ -6,8 +6,6 @@
 package cluster
 
 import (
-	"fmt"
-
 	"github.com/hoenirvili/cluster/averagelinkage"
 	"github.com/hoenirvili/cluster/completelinkage"
 	"github.com/hoenirvili/cluster/distance"
@@ -16,7 +14,7 @@ import (
 )
 
 // strategy represents the type used
-// in refitting the table of distances
+// in fiting the table of distances
 type strategy uint8
 
 const (
@@ -39,17 +37,34 @@ const (
 )
 
 // swapper defines the criteria of which we swap and
-// replace the best point based on the cluster implementation
-// and recompute their distances
+// replace the best point based on the cluster strategy
+// implementation and recompute their distances
 type swapper interface {
+	// Swap swaps the first distance with the second distance
+	// based on the cluster algorithm
 	Swap(first, second distance.Distance)
+
+	// Recompute recomputes the remaining distances after
+	// the swap process is done based on the cluster provided and returns the best
+	// distance alongside with the keys of the map of distances that should be removed
 	Recompute(based set.Set, on map[set.Set]float64) (best float64, deleted []set.Set)
 }
 
-// Fit will cluster the points into k clusters based on the strategy provided
+// Fit will fit the points in k clusters based on the strategy of clustering
+// provided. This will return the k clusters that best fits the distance points
 func Fit(points []distance.Distance, s strategy, k int) []set.Set {
 	if k <= 0 || k > len(points) {
 		return nil
+	}
+
+	// don't modify the original slice, make a copy out of it first
+	table := make([]distance.Distance, len(points), len(points))
+	for key, row := range points {
+		table[key].Set = row.Set
+		table[key].Points = make(map[set.Set]float64, len(row.Points))
+		for mkey, col := range row.Points {
+			table[key].Points[mkey] = col
+		}
 	}
 
 	var swapper swapper
@@ -59,43 +74,48 @@ func Fit(points []distance.Distance, s strategy, k int) []set.Set {
 	case CompleteLinkage:
 		swapper = completelinkage.NewCompleteLinkage()
 	case AverageLinkage:
-		swapper = averagelinkage.NewAverageLinkage(points)
+		swapper = averagelinkage.NewAverageLinkage(table)
 	}
 
 	pair := struct{ first, second set.Set }{}
-	for n := len(points); k != n; n = len(points) {
+	for n := len(table); k != n; n = len(table) {
 		bestDistance := -1.0
 		j := 0
 		for i := 0; i < n; i++ {
-			f, s, distance := points[i].Best()
+			f, s, distance := table[i].Best()
 			if f == s {
 				continue
 			}
+
 			if bestDistance == -1 || bestDistance > distance {
 				bestDistance = distance
 				pair.first, pair.second = f, s
 				j = i
+				continue
 			}
 		}
 
-		points[j].Merge(pair.second)
-		points = refit(points, pair.first, pair.second, swapper)
+		table[j].Merge(pair.second)
+		table = refit(table, pair.first, pair.second, swapper)
 
-		fmt.Println("BEGIN")
-		for _, d := range points {
-			fmt.Println(d)
-		}
-		fmt.Println("END")
+		// fmt.Println("BEGIN")
+		// for _, d := range table {
+		// 	fmt.Println(d)
+		// }
+		// fmt.Println("END")
 	}
 
 	cls := make([]set.Set, 0, k)
-	for _, c := range points {
+	for _, c := range table {
 		cls = append(cls, c.Set)
 	}
 
 	return cls
 }
 
+// refit refits all distance points based on the first and second clusters that has been
+// chosen in the i-th iteration. If the clusters provided are the same this will return the same
+// points
 func refit(points []distance.Distance, first, second set.Set, s swapper) []distance.Distance {
 	if first == second {
 		return points

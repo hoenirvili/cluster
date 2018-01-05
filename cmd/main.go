@@ -17,6 +17,6 @@ func main() {
 	for _, d := range distances {
 		fmt.Println(d)
 	}
-	clusters := cluster.Fit(distances, cluster.AverageLinkage, 3)
+	clusters := cluster.Fit(distances, cluster.SingleLinkage, 6)
 	fmt.Println(clusters)
 }
