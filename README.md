@@ -5,6 +5,9 @@
 ## Api example
 
 
+[![Build Status](https://travis-ci.org/hoenirvili/cluster.svg?branch=master)](https://travis-ci.org/hoenirvili/cluster) [![GoDoc](https://godoc.org/github.com/hoenirvili/cluster?status.svg)](https://godoc.org/github.com/hoenirvili/cluster) [![Go Report Card](https://goreportcard.com/badge/github.com/hoenirvili/cluster)](https://goreportcard.com/report/github.com/hoenirvili/cluster)
+
+
 #### One dimensional point
 
 
