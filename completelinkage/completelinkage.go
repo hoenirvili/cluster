@@ -9,10 +9,14 @@ import (
 
 type CompleteLinkge struct{}
 
+// NewCompleteLinakge creates a new CompleteLinkage pointer
 func NewCompleteLinkage() *CompleteLinkge {
 	return &CompleteLinkge{}
 }
 
+// Swap swaps the first distance with the second distance
+// if the first distance is greater than the second one
+// If not it does viceversa
 func (c CompleteLinkge) Swap(first, second distance.Distance) {
 	for fc, f := range first.Points {
 		s, ok := second.Points[fc]
@@ -23,6 +27,9 @@ func (c CompleteLinkge) Swap(first, second distance.Distance) {
 	}
 }
 
+// Recompute recomputes the remaining distances after
+// the swap process is done based on the cluster provided and returns the best
+// distance alongside with the keys of the map of distances that should be removed
 func (s CompleteLinkge) Recompute(based set.Set, on map[set.Set]float64) (float64, []set.Set) {
 	toBeDeleted := []set.Set{}
 	previous := set.NewSet()

@@ -7,11 +7,13 @@ import (
 	"github.com/hoenirvili/cluster/util"
 )
 
+// Point represents a two dimension point
 type Point struct {
 	X float64
 	Y float64
 }
 
+// NewPoint creates a new two dimensional point
 func NewPoint(x, y float64) Point {
 	return Point{X: x, Y: y}
 }
@@ -21,8 +23,13 @@ var (
 	_ dimension.Distancer = (*Point)(nil)
 )
 
+// NewDistances returns a set of distances based on the
+// coordinates x,y provided
 func NewDistances(x, y []float64) []dimension.Distancer {
 	ps := NewPoints(x, y)
+	if ps == nil {
+		return nil
+	}
 	d := make([]dimension.Distancer, 0, len(ps))
 	for _, point := range ps {
 		d = append(d, point)
@@ -31,6 +38,9 @@ func NewDistances(x, y []float64) []dimension.Distancer {
 	return d
 }
 
+// NewPoints returns based on a list of x and y coordinates
+// a list of points
+// If len(x) and len(y) is not equal this will return nil
 func NewPoints(x, y []float64) []Point {
 	if x == nil || y == nil {
 		return nil

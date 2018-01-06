@@ -50,6 +50,27 @@ func (cs setSuite) TestIn(c *gc.C) {
 	c.Assert(found, gc.Equals, false)
 }
 
+func (cs setSuite) TestSimple(c *gc.C) {
+	cls := cs.newSet(c)
+	c.Assert(cls.Simple(), gc.Equals, false)
+
+	cls = set.Set("x1")
+	c.Assert(cls.Simple(), gc.Equals, true)
+}
+
+func (cs setSuite) TestPriority(c *gc.C) {
+	one := set.Set("x2")
+	second := set.Set("x1")
+
+	p := one.Priority(second)
+	c.Assert(p, gc.Equals, false)
+
+	one, second = second, one
+
+	p = one.Priority(second)
+	c.Assert(p, gc.Equals, true)
+}
+
 func (cs setSuite) TestLen(c *gc.C) {
 	cls := cs.newSet(c)
 	got := cls.Len()

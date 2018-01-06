@@ -11,7 +11,14 @@ type AverageLinkage struct {
 	Table []distance.Distance
 }
 
+// NewAverageLinkage copies the table of distances provided and returns
+// a new pointer to AverageLinkage
+// If the table is nil, or empty it will return nil
 func NewAverageLinkage(table []distance.Distance) *AverageLinkage {
+	if table == nil || len(table) == 0 {
+		return nil
+	}
+
 	a := &AverageLinkage{}
 	n := len(table)
 	a.Table = make([]distance.Distance, n, n)
@@ -27,6 +34,7 @@ func NewAverageLinkage(table []distance.Distance) *AverageLinkage {
 	return a
 }
 
+// setEq tests if two sets/clusters are equal
 func (a AverageLinkage) setEq(row, col set.Set) bool {
 	if row == col {
 		return true
@@ -43,6 +51,8 @@ func (a AverageLinkage) setEq(row, col set.Set) bool {
 	return false
 }
 
+// distance computes the distance between two clusters from the
+// original table that has been copied
 func (a AverageLinkage) distance(row, col set.Set) float64 {
 	for _, rowTable := range a.Table {
 		if a.setEq(rowTable.Set, row) {
@@ -57,6 +67,7 @@ func (a AverageLinkage) distance(row, col set.Set) float64 {
 	panic("row, col pair given distance not found")
 }
 
+// distances returns a list of distances based on the points
 func (a AverageLinkage) distances(points []string) []float64 {
 	n := len(points)
 	distances := []float64{}
@@ -69,6 +80,7 @@ func (a AverageLinkage) distances(points []string) []float64 {
 	return distances
 }
 
+// average returns the average of all distances
 func (a AverageLinkage) average(distances []float64) float64 {
 	n := len(distances)
 	sum := 0.0
@@ -79,6 +91,8 @@ func (a AverageLinkage) average(distances []float64) float64 {
 	return sum / float64(n)
 }
 
+// Swap swaps the first distance with the second distance
+// using the average distance of a cluster point
 func (a AverageLinkage) Swap(first, second distance.Distance) {
 	points := first.Set.Slice()
 	n := len(points)
@@ -98,6 +112,9 @@ func (a AverageLinkage) Swap(first, second distance.Distance) {
 	}
 }
 
+// Recompute recomputes the remaining distances after
+// the swap process is done based on the cluster provided and returns the best
+// distance alongside with the keys of the map of distances that should be removed
 func (a AverageLinkage) Recompute(based set.Set, on map[set.Set]float64) (float64, []set.Set) {
 	toBeDeleted := []set.Set{}
 	previous := set.NewSet()

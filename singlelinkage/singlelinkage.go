@@ -9,10 +9,14 @@ import (
 
 type SingleLinkage struct{}
 
+// NewSingleLinkage creates a new pointer of type SingleLinkage
 func NewSingleLinkage() *SingleLinkage {
 	return &SingleLinkage{}
 }
 
+// Swap swaps the first distance with the second distance
+// if the first distance is lesser than the second one
+// If not it does viceversa
 func (s SingleLinkage) Swap(first, second distance.Distance) {
 	for fc, f := range first.Points {
 		s, ok := second.Points[fc]
@@ -23,6 +27,9 @@ func (s SingleLinkage) Swap(first, second distance.Distance) {
 	}
 }
 
+// Recompute recomputes the remaining distances after
+// the swap process is done based on the cluster provided and returns the best
+// distance alongside with the keys of the map of distances that should be removed
 func (s SingleLinkage) Recompute(based set.Set, on map[set.Set]float64) (float64, []set.Set) {
 	toBeDeleted := []set.Set{}
 	previous := set.NewSet()

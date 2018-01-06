@@ -18,6 +18,9 @@ func NewPoint(point float64) Point {
 // NewPoints returns a slice of one dimension points
 func NewPoints(points ...float64) []Point {
 	n := len(points)
+	if n == 0 {
+		return nil
+	}
 	p := make([]Point, 0, n)
 	for i := 0; i < n; i++ {
 		p = append(p, Point(points[i]))
@@ -29,6 +32,9 @@ func NewPoints(points ...float64) []Point {
 // NewDistances returns new one dimension distance points
 func NewDistances(points ...float64) []dimension.Distancer {
 	ps := NewPoints(points...)
+	if ps == nil {
+		return nil
+	}
 	d := make([]dimension.Distancer, 0, len(points))
 	for _, point := range ps {
 		d = append(d, point)
