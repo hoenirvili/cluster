@@ -1,6 +1,7 @@
 # cluster
 
-
+Simple bottom up agglomerative cluster library that supports one and two dimensional points. 
+For computing the distance between two dimensional points we use the Euclidian distance.
 
 ## Api example
 
