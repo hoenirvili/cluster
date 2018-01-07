@@ -1,3 +1,4 @@
+// Thin interface for defining different set of point
 package dimension
 
 // Point defines a given one, two or n dimension point
@@ -6,7 +7,7 @@ type Point interface {
 	Coordinates() []float64
 }
 
-// Distancer is the minimal set of behaveour
+// Distancer is the minimal set of behaviour
 // for computing the distance between two points
 type Distancer interface {
 	Point

@@ -1,3 +1,4 @@
+// Package that defines one dimensional points
 package one
 
 import (

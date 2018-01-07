@@ -1,3 +1,4 @@
+// Package used for computing distance between points
 package distance
 
 import (

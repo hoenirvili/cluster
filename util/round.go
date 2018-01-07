@@ -1,3 +1,4 @@
+// Utility package used for clustering
 package util
 
 import "math"

@@ -2,7 +2,6 @@
 // At the beginning of the process, each element is in a cluster of its own.
 // The clusters are then sequentially combined into larger clusters
 // until all elements end up being in the same cluster.
-
 package cluster
 
 import (

@@ -1,3 +1,5 @@
+// Package providing basic semantics for choosing different
+// clusters that are best fitted for complete linkage clustering
 package completelinkage
 
 import (
