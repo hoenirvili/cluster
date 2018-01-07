@@ -2,7 +2,7 @@ package util
 
 import "math"
 
-// round rounds the floating point
+// Round rounds the floating point
 // number based on the prec given
 func Round(x float64, prec int) float64 {
 	if x == 0 {

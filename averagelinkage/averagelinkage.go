@@ -5,6 +5,8 @@ import (
 	"github.com/hoenirvili/cluster/set"
 )
 
+// AverageLinkage type that represents the single linkage
+// bottom up cluster semantics
 type AverageLinkage struct {
 	// this will hold a copy of the table of distances
 	// in the 0 interation

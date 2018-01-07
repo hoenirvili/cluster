@@ -7,6 +7,8 @@ import (
 	"github.com/hoenirvili/cluster/set"
 )
 
+// SingleLinkage type that represents the single linkage
+// bottom up cluster semantics
 type SingleLinkage struct{}
 
 // NewSingleLinkage creates a new pointer of type SingleLinkage
