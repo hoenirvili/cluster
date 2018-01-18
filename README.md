@@ -57,6 +57,7 @@ func main() {
         []float64{-4, -3, -2, -1, 1, 1, 2, 3, 3, 4},
         []float64{-2, -2, -2, -2, -1, 1, 3, 2, 4, 3},
     )
+    k := 3
     distances := distance.NewDistances(points)
     clusters := cluster.Fit(distances, cluster.SingleLinkage, k)
     fmt.Println(clusters)
