@@ -107,7 +107,12 @@ func (s Set) Priority(set Set) bool {
 }
 
 // Len returns the number of points in a cluster
-func (s Set) Len() int { return len(s.Slice()) }
+func (s Set) Len() int {
+	if s == Set("") {
+		return 0
+	}
+	return len(s.Slice())
+}
 
 // Swap swaps cluster points
 func (s *Set) Swap(i, j int) {
@@ -122,6 +127,11 @@ func (s Set) Less(i, j int) bool { return s.num(i) < s.num(j) }
 // Add appends a point in the set
 // If the point is already in the set it will add it
 func (s *Set) Add(point Set) {
+	if s.Len() == 0 {
+		*s = point
+		return
+	}
+
 	ps := string(point)
 	if ps == "" {
 		return

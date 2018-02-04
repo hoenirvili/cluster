@@ -68,17 +68,23 @@ func (a AverageLinkage) distance(row, col set.Set) float64 {
 		}
 	}
 
-	panic("row, col pair given distance not found")
+	return -1
 }
 
 // distances returns a list of distances based on the points
-func (a AverageLinkage) distances(points []string) []float64 {
-	n := len(points)
+func (a AverageLinkage) distances(fixed set.Set, point set.Set) []float64 {
+	sfixed := fixed.Slice()
+	spoint := point.Slice()
+	n, m := len(sfixed), len(spoint)
 	distances := []float64{}
 	for i := 0; i < n; i++ {
-		for j := i + 1; j < n; j++ {
-			row, col := set.Set(points[i]), set.Set(points[j])
-			distances = append(distances, a.distance(row, col))
+		for j := 0; j < m; j++ {
+			row, col := set.Set(sfixed[i]), set.Set(spoint[j])
+			d := a.distance(row, col)
+			if d == -1 {
+				d = a.distance(col, row)
+			}
+			distances = append(distances, d)
 		}
 	}
 	return distances
@@ -88,6 +94,7 @@ func (a AverageLinkage) distances(points []string) []float64 {
 func (a AverageLinkage) average(distances []float64) float64 {
 	n := len(distances)
 	sum := 0.0
+
 	for i := 0; i < n; i++ {
 		sum += distances[i]
 	}
@@ -98,20 +105,11 @@ func (a AverageLinkage) average(distances []float64) float64 {
 // Swap swaps the first distance with the second distance
 // using the average distance of a cluster point
 func (a AverageLinkage) Swap(first, second distance.Distance) {
-	points := first.Set.Slice()
-	n := len(points)
-
 	for fc := range first.Points {
 		if _, ok := second.Points[fc]; !ok {
 			continue
 		}
-		if n == len(points) {
-			points = append(points, string(fc))
-		} else {
-			points[n] = string(fc)
-		}
-
-		distances := a.distances(points)
+		distances := a.distances(first.Set, fc)
 		first.Points[fc] = a.average(distances)
 	}
 }
@@ -119,11 +117,11 @@ func (a AverageLinkage) Swap(first, second distance.Distance) {
 // Recompute recomputes the remaining distances after
 // the swap process is done based on the cluster provided and returns the best
 // distance alongside with the keys of the map of distances that should be removed
-func (a AverageLinkage) Recompute(based set.Set, on map[set.Set]float64) (float64, []set.Set) {
-	toBeDeleted := []set.Set{}
-	previous := set.NewSet()
+func (a AverageLinkage) Recompute(based set.Set, on distance.Distance) (float64, []set.Set) {
+
+	previous, toBeDeleted := set.NewSet(), set.NewSet()
 	best := -1.0
-	for cluster, distance := range on {
+	for cluster, distance := range on.Points {
 		if based.In(cluster) {
 			if best == -1.0 {
 				best = distance
@@ -132,13 +130,32 @@ func (a AverageLinkage) Recompute(based set.Set, on map[set.Set]float64) (float6
 			}
 			if best > distance {
 				best = distance
-				toBeDeleted = append(toBeDeleted, previous)
+				toBeDeleted.Add(previous)
 				previous = cluster
 			} else {
-				toBeDeleted = append(toBeDeleted, cluster)
+				toBeDeleted.Add(cluster)
 			}
 		}
 	}
 
-	return best, toBeDeleted
+	// compute the average
+	distances := a.distances(based, on.Set)
+	best = a.average(distances)
+
+	var toDelete []set.Set
+	stobeDeleted := toBeDeleted.Slice()
+	for _, deleted := range stobeDeleted {
+		for _, s := range based.Slice() {
+			if s != deleted {
+				if on.Points != nil {
+					on.Points[set.Set(s)] = best
+				}
+				break
+			}
+		}
+
+		toDelete = append(toDelete, set.Set(deleted))
+	}
+
+	return best, toDelete
 }

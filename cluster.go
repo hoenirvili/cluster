@@ -5,6 +5,8 @@
 package cluster
 
 import (
+	"fmt"
+
 	"github.com/hoenirvili/cluster/averagelinkage"
 	"github.com/hoenirvili/cluster/completelinkage"
 	"github.com/hoenirvili/cluster/distance"
@@ -46,7 +48,7 @@ type swapper interface {
 	// Recompute recomputes the remaining distances after
 	// the swap process is done based on the cluster provided and returns the best
 	// distance alongside with the keys of the map of distances that should be removed
-	Recompute(based set.Set, on map[set.Set]float64) (best float64, deleted []set.Set)
+	Recompute(based set.Set, on distance.Distance) (best float64, deleted []set.Set)
 }
 
 // Fit will fit the points in k clusters based on the strategy of clustering
@@ -97,11 +99,11 @@ func Fit(points []distance.Distance, s strategy, k int) []set.Set {
 		table[j].Merge(pair.second)
 		table = refit(table, pair.first, pair.second, swapper)
 
-		// fmt.Println("BEGIN")
-		// for _, d := range table {
-		// 	fmt.Println(d)
-		// }
-		// fmt.Println("END")
+		fmt.Println("BEGIN")
+		for _, d := range table {
+			fmt.Println(d)
+		}
+		fmt.Println("END")
 	}
 
 	cls := make([]set.Set, 0, k)
@@ -167,7 +169,7 @@ func recomputeDistances(points []distance.Distance, base set.Set, s swapper) {
 			continue
 		}
 
-		best, toDelete := s.Recompute(base, points[i].Points)
+		best, toDelete := s.Recompute(base, points[i])
 		if best == -1.0 {
 			continue
 		}

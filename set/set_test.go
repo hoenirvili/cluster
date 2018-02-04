@@ -99,6 +99,23 @@ func (cs setSuite) TestAdd(c *gc.C) {
 	c.Assert(cls, gc.DeepEquals, expected)
 }
 
+func (cs setSuite) TestAddFromEmpty(c *gc.C) {
+	cls := set.NewSet()
+	point := set.Set("x5")
+	cls.Add(point)
+	c.Assert(cls, gc.DeepEquals, point)
+	slice := cls.Slice()
+	c.Assert(slice, gc.DeepEquals, []string{"x5"})
+	c.Assert(len(slice), gc.Equals, cls.Len())
+
+	cls = set.NewSet()
+	point1, point2 := set.Set("x5"), set.Set("x6")
+	cls.Add(point1)
+	cls.Add(point2)
+	c.Assert(cls, gc.DeepEquals, set.Set("x5,x6"))
+	c.Assert(cls.Len(), gc.Equals, len(cls.Slice()))
+}
+
 func (cs setSuite) TestAddDuplicate(c *gc.C) {
 	cls := cs.newSet(c)
 	point := set.Set("x5")

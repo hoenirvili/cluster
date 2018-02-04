@@ -34,11 +34,11 @@ func (c CompleteLinkage) Swap(first, second distance.Distance) {
 // Recompute recomputes the remaining distances after
 // the swap process is done based on the cluster provided and returns the best
 // distance alongside with the keys of the map of distances that should be removed
-func (c CompleteLinkage) Recompute(based set.Set, on map[set.Set]float64) (float64, []set.Set) {
+func (c CompleteLinkage) Recompute(based set.Set, on distance.Distance) (float64, []set.Set) {
 	toBeDeleted := []set.Set{}
 	previous := set.NewSet()
 	best := -1.0
-	for cluster, distance := range on {
+	for cluster, distance := range on.Points {
 		if based.In(cluster) {
 			if best == -1.0 {
 				best = distance
