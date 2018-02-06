@@ -1,10 +1,11 @@
-// Package providing basic semantics for choosing different
+// Package averagelinkage provides basic semantics for choosing different
 // clusters that are best fitted for average linkage clustering
 package averagelinkage
 
 import (
 	"github.com/hoenirvili/cluster/distance"
 	"github.com/hoenirvili/cluster/set"
+	"github.com/hoenirvili/cluster/util"
 )
 
 // AverageLinkage type that represents the single linkage
@@ -55,8 +56,8 @@ func (a AverageLinkage) setEq(row, col set.Set) bool {
 	return false
 }
 
-// distance computes the distance between two clusters from the
-// original table that has been copied
+// distance computes the distance between two clusters
+// from the table at the iteration 0
 func (a AverageLinkage) distance(row, col set.Set) float64 {
 	for _, rowTable := range a.Table {
 		if a.setEq(rowTable.Set, row) {
@@ -99,7 +100,8 @@ func (a AverageLinkage) average(distances []float64) float64 {
 		sum += distances[i]
 	}
 
-	return sum / float64(n)
+	r := sum / float64(n)
+	return util.Round(r, 4)
 }
 
 // Swap swaps the first distance with the second distance
@@ -119,7 +121,8 @@ func (a AverageLinkage) Swap(first, second distance.Distance) {
 // distance alongside with the keys of the map of distances that should be removed
 func (a AverageLinkage) Recompute(based set.Set, on distance.Distance) (float64, []set.Set) {
 
-	previous, toBeDeleted := set.NewSet(), set.NewSet()
+	toBeDeleted := []set.Set{}
+	previous := set.NewSet()
 	best := -1.0
 	for cluster, distance := range on.Points {
 		if based.In(cluster) {
@@ -130,10 +133,10 @@ func (a AverageLinkage) Recompute(based set.Set, on distance.Distance) (float64,
 			}
 			if best > distance {
 				best = distance
-				toBeDeleted.Add(previous)
+				toBeDeleted = append(toBeDeleted, previous)
 				previous = cluster
 			} else {
-				toBeDeleted.Add(cluster)
+				toBeDeleted = append(toBeDeleted, cluster)
 			}
 		}
 	}
@@ -142,20 +145,5 @@ func (a AverageLinkage) Recompute(based set.Set, on distance.Distance) (float64,
 	distances := a.distances(based, on.Set)
 	best = a.average(distances)
 
-	var toDelete []set.Set
-	stobeDeleted := toBeDeleted.Slice()
-	for _, deleted := range stobeDeleted {
-		for _, s := range based.Slice() {
-			if s != deleted {
-				if on.Points != nil {
-					on.Points[set.Set(s)] = best
-				}
-				break
-			}
-		}
-
-		toDelete = append(toDelete, set.Set(deleted))
-	}
-
-	return best, toDelete
+	return best, toBeDeleted
 }

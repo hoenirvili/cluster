@@ -1,4 +1,5 @@
-// Thin interface for defining different set of point
+// Package dimension provides a small interface
+// for defining different set of point
 package dimension
 
 // Point defines a given one, two or n dimension point

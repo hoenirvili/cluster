@@ -76,6 +76,11 @@ func (cs setSuite) TestLen(c *gc.C) {
 	got := cls.Len()
 	expected := 3
 	c.Assert(got, gc.Equals, expected)
+
+	cls = set.NewSet()
+	got = cls.Len()
+	expected = 0
+	c.Assert(got, gc.Equals, expected)
 }
 
 func (cs setSuite) TestSwap(c *gc.C) {

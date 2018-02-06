@@ -1,12 +1,7 @@
-// Clustering is one of several methods of hierarchical clustering.
-// At the beginning of the process, each element is in a cluster of its own.
-// The clusters are then sequentially combined into larger clusters
-// until all elements end up being in the same cluster.
+// Package cluster has one of several methods of hierarchical clustering.
 package cluster
 
 import (
-	"fmt"
-
 	"github.com/hoenirvili/cluster/averagelinkage"
 	"github.com/hoenirvili/cluster/completelinkage"
 	"github.com/hoenirvili/cluster/distance"
@@ -58,7 +53,7 @@ func Fit(points []distance.Distance, s strategy, k int) []set.Set {
 		return nil
 	}
 
-	// don't modify the original slice, make a copy out of it first
+	// don't modify the original slice, make a copy out of it
 	table := make([]distance.Distance, len(points), len(points))
 	for key, row := range points {
 		table[key].Set = row.Set
@@ -98,12 +93,6 @@ func Fit(points []distance.Distance, s strategy, k int) []set.Set {
 
 		table[j].Merge(pair.second)
 		table = refit(table, pair.first, pair.second, swapper)
-
-		fmt.Println("BEGIN")
-		for _, d := range table {
-			fmt.Println(d)
-		}
-		fmt.Println("END")
 	}
 
 	cls := make([]set.Set, 0, k)
@@ -147,9 +136,10 @@ func refit(points []distance.Distance, first, second set.Set, s swapper) []dista
 		points = append(points[:j], points[j+1:]...)
 	}
 
-	// the last should always be nil
+	// check if the last is nil and if not
+	// remove all keys and assign it to nil
 	last := len(points) - 1
-	if (points)[last].Points != nil {
+	if points[last].Points != nil {
 		for key := range points[last].Points {
 			delete(points[last].Points, key)
 		}
@@ -170,20 +160,22 @@ func recomputeDistances(points []distance.Distance, base set.Set, s swapper) {
 		}
 
 		best, toDelete := s.Recompute(base, points[i])
-		if best == -1.0 {
+		if best == -1.0 || len(toDelete) == 0 {
 			continue
 		}
 
+		// delete all the unwanted keys that does not
+		// belong to the pair base
 		for _, key := range toDelete {
 			delete(points[i].Points, key)
 		}
 
+		// find that point remaining point and delete it
+		// and create a new entry with base key and best value
 		for cluster := range points[i].Points {
 			if base.In(cluster) {
-				value := points[i].Points[cluster]
 				delete(points[i].Points, cluster)
-				key := base
-				points[i].Points[key] = value
+				points[i].Points[base] = best
 				break
 			}
 		}

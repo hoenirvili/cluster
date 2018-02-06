@@ -69,25 +69,42 @@ func (a averageLinkageSuite) TestAverageLinkageRecompute(c *gc.C) {
 
 	avl := averagelinkage.NewAverageLinkage(table)
 	based := set.Set("x2")
-	on := map[set.Set]float64{"x3": 0.80}
+	on := distance.Distance{
+		Set:    set.Set("x2"),
+		Points: map[set.Set]float64{"x3": 0.80},
+	}
 	best, toDelete := avl.Recompute(based, on)
-	c.Assert(on, gc.DeepEquals, map[set.Set]float64{"x3": 0.80})
+	// let's make sure the on it's not modified after the call
+	c.Assert(on, gc.DeepEquals, distance.Distance{
+		Set:    set.Set("x2"),
+		Points: map[set.Set]float64{"x3": 0.80},
+	})
 	c.Assert(best, gc.Equals, -1.0)
 	c.Assert(toDelete, gc.DeepEquals, []set.Set{})
 
 	based = set.Set("x1,x8")
-	on = map[set.Set]float64{
-		"x2": 0.32,
-		"x3": 0.10,
+	on = distance.Distance{
+		Set: set.Set("x1"),
+		Points: map[set.Set]float64{
+			"x2": 0.32,
+			"x3": 0.10,
+		},
 	}
 	best, toDelete = avl.Recompute(based, on)
-	c.Assert(on, gc.DeepEquals, map[set.Set]float64{"x2": 0.32, "x3": 0.10})
+	// let's make sure the on it's not modified after the call
+	c.Assert(on, gc.DeepEquals, distance.Distance{
+		Set:    set.Set("x1"),
+		Points: map[set.Set]float64{"x2": 0.32, "x3": 0.10},
+	})
 	c.Assert(best, gc.Equals, -1.0)
 	c.Assert(toDelete, gc.DeepEquals, []set.Set{})
 
 	based = set.Set("x2,x3")
 	best, toDelete = avl.Recompute(based, on)
-	c.Assert(on, gc.DeepEquals, map[set.Set]float64{"x3": 0.10, "x2": 0.32})
-	c.Assert(best, gc.Equals, 0.10)
+	c.Assert(on, gc.DeepEquals, distance.Distance{
+		Set:    set.Set("x1"),
+		Points: map[set.Set]float64{"x3": 0.10, "x2": 0.32},
+	})
+	c.Assert(best, gc.Equals, 0.21)
 	c.Assert(toDelete, gc.DeepEquals, []set.Set{"x2"})
 }

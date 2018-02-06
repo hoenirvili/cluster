@@ -154,12 +154,12 @@ func (cl clusterSuite) TestDistanceFitTwoCompleteLinkage(c *gc.C) {
 func (cl clusterSuite) TestDistanceFitTwoAverageLinkage(c *gc.C) {
 	expected := [][]set.Set{
 		{"x1,x2,x3,x4,x5,x6,x7,x8,x9,x10"},
-		{"x1,x2,x3,x4,x5,x6", "x7,x8,x9,x10"},
+		{"x1,x2,x3,x4", "x5,x6,x7,x8,x9,x10"},
 		{"x1,x2,x3,x4", "x5,x6", "x7,x8,x9,x10"},
 		{"x1,x2,x3,x4", "x5", "x6", "x7,x8,x9,x10"},
-		{"x1,x2,x3,x4", "x5", "x6", "x7,x8", "x9,x10"},
-		{"x1,x2,x3,x4", "x5", "x6", "x7,x8", "x9", "x10"},
-		{"x1,x2,x3,x4", "x5", "x6", "x7", "x8", "x9", "x10"},
+		{"x1,x2", "x3,x4", "x5", "x6", "x7,x8,x9,x10"},
+		{"x1,x2", "x3,x4", "x5", "x6", "x7,x8", "x9,x10"},
+		{"x1,x2", "x3,x4", "x5", "x6", "x7,x8", "x9", "x10"},
 		{"x1,x2", "x3,x4", "x5", "x6", "x7", "x8", "x9", "x10"},
 		{"x1,x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10"},
 		{"x1", "x2", "x3", "x4", "x5", "x6", "x7", "x8", "x9", "x10"},

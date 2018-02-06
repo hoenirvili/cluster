@@ -35,6 +35,9 @@ func NewSet(points ...string) Set {
 
 // Slice returns a slice of string sets
 func (s Set) Slice() []string {
+	if s == "" {
+		return []string{}
+	}
 	return strings.Split(string(s), ",")
 }
 
@@ -108,9 +111,6 @@ func (s Set) Priority(set Set) bool {
 
 // Len returns the number of points in a cluster
 func (s Set) Len() int {
-	if s == Set("") {
-		return 0
-	}
 	return len(s.Slice())
 }
 

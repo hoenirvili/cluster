@@ -38,11 +38,13 @@ func (cls completeLinkageSuite) TestCompleteLinkageSwap(c *gc.C) {
 
 func (cls completeLinkageSuite) TestCompleteLinkageRecompute(c *gc.C) {
 	based := set.Set("x2,x3")
-	on := map[set.Set]float64{
-		"x1": 0.2,
-		"x2": 0.8,
-		"x3": 0.1,
-		"x7": 1.6,
+	on := distance.Distance{
+		Points: map[set.Set]float64{
+			"x1": 0.2,
+			"x2": 0.8,
+			"x3": 0.1,
+			"x7": 1.6,
+		},
 	}
 	cl := completelinkage.NewCompleteLinkage()
 

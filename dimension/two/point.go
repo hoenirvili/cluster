@@ -1,4 +1,4 @@
-// Package that defines two dimensional points
+// Package two defines two dimensional points
 package two
 
 import (
