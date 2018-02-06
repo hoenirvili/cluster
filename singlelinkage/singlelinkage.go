@@ -1,4 +1,4 @@
-// Package providing basic semantics for choosing different
+// Package singlelinkage providing basic semantics for choosing different
 // clusters that are best fitted for single linkage clustering
 package singlelinkage
 
