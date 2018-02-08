@@ -17,3 +17,8 @@ func (u utilSuite) TestRound(c *gc.C) {
 	f = util.Round(0, 10)
 	c.Assert(f, gc.Equals, 0.0)
 }
+
+func (u utilSuite) TestRoundEmpty(c *gc.C) {
+	f := util.Round(0, 2)
+	c.Assert(f, gc.Equals, 0.0)
+}
