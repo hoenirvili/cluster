@@ -6,7 +6,7 @@ For computing the distance between two dimensional points we use the Euclidian d
 ## Api example
 
 
-[![Build Status](https://travis-ci.org/hoenirvili/cluster.svg?branch=master)](https://travis-ci.org/hoenirvili/cluster) [![GoDoc](https://godoc.org/github.com/hoenirvili/cluster?status.svg)](https://godoc.org/github.com/hoenirvili/cluster) [![Go Report Card](https://goreportcard.com/badge/github.com/hoenirvili/cluster)](https://goreportcard.com/report/github.com/hoenirvili/cluster)
+[![Build Status](https://travis-ci.org/hoenirvili/cluster.svg?branch=master)](https://travis-ci.org/hoenirvili/cluster) [![GoDoc](https://godoc.org/github.com/hoenirvili/cluster?status.svg)](https://godoc.org/github.com/hoenirvili/cluster) [![Go Report Card](https://goreportcard.com/badge/github.com/hoenirvili/cluster)](https://goreportcard.com/report/github.com/hoenirvili/cluster) [![Coverage Status](https://coveralls.io/repos/github/hoenirvili/cluster/badge.svg?branch=master)](https://coveralls.io/github/hoenirvili/cluster?branch=master)
 
 
 #### One dimensional point
